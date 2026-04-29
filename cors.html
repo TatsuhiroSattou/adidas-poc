@@ -1,15 +1,15 @@
-```html
+```html id="j3v9qm"
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Test</title>
+    <title>CORS Account Test</title>
 </head>
 <body>
 
-<h2>CORS Test</h2>
-<pre id="output">Cargando...</pre>
+<h2>Adidas Account CORS Test</h2>
+<pre id="output">Cargando respuesta...</pre>
 
 <script>
 fetch("https://www.adidas.com/ec/es/account", {
@@ -19,11 +19,12 @@ fetch("https://www.adidas.com/ec/es/account", {
 .then(response => response.text())
 .then(data => {
     document.getElementById("output").textContent = data;
+    console.log("Respuesta recibida:");
     console.log(data);
 })
 .catch(error => {
     document.getElementById("output").textContent = "Error: " + error;
-    console.error(error);
+    console.error("Fetch error:", error);
 });
 </script>
 
