@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSP Corregido para permitir la inyección dinámica segura -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+    
+    <title>Honrando la Memoria y Fe de Carlitos Polanco</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=600;700&family=Montserrat:wght=300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="web-container">
+        
+        <!-- Menú de Navegación Superior Funcional -->
+        <nav class="top-nav">
+            <button class="nav-btn active" id="btn-inicio">Inicio</button>
+            <button class="nav-btn" id="btn-sobre">Sobre Carlitos</button>
+            <button class="nav-btn" id="btn-fe">Fe y Esperanza</button>
+            <button class="nav-btn" id="btn-recursos">Recursos</button>
+            <button class="nav-btn" id="btn-contacto">Contacto</button>
+        </nav>
+
+        <!-- Bloque de Cabecera y Perfil con Fondo de Cielo Gradual -->
+        <header class="hero-section">
+            <div class="hero-titles">
+                <p class="uppercase-accent">HONRANDO LA MEMORIA Y FE DE</p>
+                <h1 class="carlitos-title">CARLITOS POLANCO</h1>
+                <p class="dates-label">En Memoria (Fechas)</p>
+            </div>
+            
+            <div class="wave-separator">
+                <h2 class="sub-banner-title">UN MENSAJE DE ESPERANZA Y FE EN CRISTO</h2>
+                
+                <div class="profile-row">
+                    <div class="profile-side left-side">
+                        <span class="side-name">CARLITOS POLANCO</span>
+                    </div>
+                    
+                    <div class="profile-center-avatar">
+                        <div class="avatar-frame">
+                            <img src="https://scontent.fgye29-1.fna.fbcdn.net/v/t39.30808-6/469388374_122122005806405438_5004134732790136384_n.jpg?stp=dst-jpg_tt6&cstp=mx768x768&ctp=s768x768&_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=TLo2Tr-Inz0Q7kNvwFSWmIb&_nc_oc=Ado7JZD415ojm7pBRuWT0owojex58x3FD1mnWg3aAycZLQABRpuDKvlmFvF8TiwHq6w&_nc_zt=23&_nc_ht=scontent.fgye29-1.fna&_nc_gid=SxyJYv0I5WDgwX9ZSEuKKQ&_nc_ss=7b2a8&oh=00_Af-yyHqNlfhMNwSy_cl5ZqHB72y64J2N5fxTys2HVIzUqw&oe=6A379357" alt="Carlitos Polanco" class="avatar-element" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="avatar-placeholder" style="display:none; width:100%; height:100%; justify-content:center; align-items:center; background:#cedee7; color:#1a365d; font-weight:bold; border-radius:50%;">CP</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-side right-side">
+                        <p class="biography-preview">
+                            Carlitos Polanco ha dejado un legado de mucha memoria y Fe en Cristo. Con su testimonio diario, bendijo la vida de quienes le rodeaban, motivando siempre a perseverar. Una persona que sembró esperanza, fe constante ante la adversidad y un testimonio inquebrantable que hoy vive en nuestros corazones.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenedor Dinámico Cambiante controlado por los botones superiores -->
+        <main id="dynamic-content-area" class="main-content-wrapper">
+            <!-- Por defecto se carga la grilla de inicio mediante JavaScript al abrir la página -->
+        </main>
+
+        <!-- Ventana Modal de Seguridad para los Contenidos Internos -->
+        <div id="secure-app-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+            <div class="modal-card-box">
+                <span class="modal-close-cross" id="cerrar-modal">&times;</span>
+                <!-- Contenedor requerido para la inyección segura de textos planos desde JS -->
+                <div id="modal-secure-payload"></div>
+            </div>
+        </div>
+
+        <!-- Footer Oficial -->
+        <footer class="site-footer">
+            <p>© Copyright 2026 - All Rights Reserved.</p>
+            <p class="sub-footer-text">Un mensaje a la memoria y fe de mensaje de paz.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
